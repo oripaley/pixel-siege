@@ -2,7 +2,7 @@
 const KEY = 'pixel-siege.save.v1';
 
 export const Save = {
-  data: { best: 0, maxLevel: 1 },
+  data: { best: 0, maxLevel: 1, muted: false },
   load() {
     try {
       const d = JSON.parse(localStorage.getItem(KEY));

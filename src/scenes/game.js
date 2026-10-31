@@ -9,6 +9,7 @@ import { getLevel } from '../levels.js';
 import { circleHit } from '../collision.js';
 import { SPR, makeFloor, drawSprite } from '../sprites.js';
 import { drawText, drawHearts, drawPanel, Button } from '../ui.js';
+import { Sound } from '../audio.js';
 import { LevelCompleteScene } from './levelComplete.js';
 import { GameOverScene } from './gameOver.js';
 import { MenuScene } from './menu.js';
@@ -42,8 +43,9 @@ export class GameScene {
     this.paused = false;
     this.t = 0;
     this.pauseButtons = [
-      new Button('RESUME', W / 2 - 50, 84, 100, 15, () => (this.paused = false)),
-      new Button('QUIT TO MENU', W / 2 - 50, 104, 100, 15, () => core.go(new MenuScene())),
+      new Button('RESUME', W / 2 - 50, 76, 100, 15, () => (this.paused = false)),
+      new Button(Sound.label, W / 2 - 50, 94, 100, 15, () => Sound.toggle()),
+      new Button('QUIT TO MENU', W / 2 - 50, 112, 100, 15, () => core.go(new MenuScene())),
     ];
     this.showBanner(`LEVEL ${levelNum}`, this.level.name, 2.2);
   }
@@ -56,6 +58,7 @@ export class GameScene {
 
   enemyShoot(x, y, angle, speed) {
     this.enemyBullets.push(new Bullet(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, { enemy: true, life: 6 }));
+    Sound.play('enemyShoot');
   }
 
   spawnEnemy(type, x, y) {
@@ -65,6 +68,7 @@ export class GameScene {
     this.enemies.push(e);
     if (e.boss) {
       this.showBanner('WARNING!', 'BOSS APPROACHING', 2, '#ff4f4f');
+      Sound.play('bossWarning');
       this.shake(3, 0.5);
     }
   }
@@ -85,6 +89,7 @@ export class GameScene {
     this.state = 'fighting';
     const sub = i === 0 ? 'GET READY' : i === n - 1 ? 'FINAL WAVE' : 'WAVE CLEAR - GET READY';
     this.showBanner(`WAVE ${i + 1}/${n}`, sub, 1.6);
+    Sound.play('wave');
   }
 
   levelCleared() {
@@ -94,11 +99,13 @@ export class GameScene {
     for (const b of this.enemyBullets) this.particles.burst(b.x, b.y, ['#a65ee0', '#ff4f4f'], 4, 30, 0.3);
     this.enemyBullets = [];
     this.showBanner('LEVEL CLEAR!', 'NICE SHOOTING', 2.2);
+    Sound.play('levelClear');
   }
 
   playerHurt() {
     const p = this.player;
     if (!p.hurt()) return;
+    Sound.play(p.hp <= 0 ? 'playerDeath' : 'hurt');
     this.stats.damageTaken++;
     this.shake(4, 0.25);
     this.hurtOverlay = 0.25;
@@ -119,6 +126,7 @@ export class GameScene {
     const big = e.boss ? 3 : e.type === 'tank' ? 1.6 : 1;
     this.particles.burst(e.x, e.y, e.def.colors, Math.round(14 * big), 80 * Math.min(big, 2), 0.55 * big);
     this.particles.text(e.x, e.y - 8, `+${e.score}`, '#ffd23f');
+    Sound.play(e.boss ? 'bossDeath' : e.type === 'tank' ? 'bigDeath' : 'death');
     this.shake(e.boss ? 6 : 1.5, e.boss ? 0.6 : 0.1);
     this.splat(e.x, e.y, e.def.colors[1], e.r);
 
@@ -152,6 +160,7 @@ export class GameScene {
   update(dt) {
     if (this.state !== 'dying' && (Input.wasPressed('Escape', 'KeyP') || (Input.focusLost && !this.paused))) {
       this.paused = !this.paused;
+      Sound.play('click');
       return;
     }
     if (this.paused) {
@@ -238,6 +247,7 @@ export class GameScene {
         const sp = Math.hypot(b.vx, b.vy) || 1;
         this.particles.sparks(b.x, b.y, Math.atan2(b.vy, b.vx));
         if (e.hit(b.damage, b.vx / sp, b.vy / sp)) this.killEnemy(e);
+        else Sound.play('hit');
         break;
       }
     }
@@ -270,9 +280,11 @@ export class GameScene {
       if (k.type === 'heart') {
         p.hp = Math.min(p.maxHp, p.hp + 1);
         this.particles.text(k.x, k.y - 6, '+1 HP', '#ff4f4f');
+        Sound.play('pickup');
       } else {
         p.rapid = 6;
         this.particles.text(k.x, k.y - 6, 'RAPID FIRE!', '#ffd23f');
+        Sound.play('powerup');
       }
       this.particles.burst(k.x, k.y, ['#f4f4f4', '#ffd23f'], 8, 40, 0.3);
     }
@@ -381,7 +393,8 @@ export class GameScene {
   drawPause(ctx) {
     ctx.fillStyle = 'rgba(11,8,20,0.7)';
     ctx.fillRect(0, 0, W, H);
-    drawPanel(ctx, W / 2 - 70, 40, 140, 90);
+    this.pauseButtons[1].label = Sound.label;
+    drawPanel(ctx, W / 2 - 70, 40, 140, 96);
     drawText(ctx, 'PAUSED', W / 2, 52, { scale: 3, align: 'center', color: '#ffd23f', shadow: '#140c1c' });
     for (const b of this.pauseButtons) b.draw(ctx);
   }

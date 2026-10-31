@@ -19,6 +19,7 @@ ES modules don't load from `file://`, so serve the folder locally:
 | Mouse | Aim |
 | Left click (hold) | Shoot |
 | Esc / P | Pause |
+| M | Sound on/off |
 
 ## Structure
 
@@ -29,6 +30,7 @@ src/core.js             constants + active scene
 src/input.js            keyboard/mouse (mouse in game pixels)
 src/sprites.js          pixel-art grids -> baked canvases, floor generator
 src/ui.js               3x5 bitmap font, buttons, HUD helpers
+src/audio.js            synthesized retro sound effects (Web Audio API)
 src/levels.js           level/wave data + endless generator
 src/spawner.js          spawns wave enemies from screen edges
 src/entities/           player, enemy types, bullets, particles

@@ -1,6 +1,7 @@
 import { W, H } from '../core.js';
 import { SPR, drawSprite, drawShadow } from '../sprites.js';
 import { clamp } from '../collision.js';
+import { Sound } from '../audio.js';
 
 export const TYPES = {
   grunt:   { hp: 3,  speed: 30, r: 5,  score: 100,  kb: 70, fps: 5,  colors: ['#73b84a', '#3e7d3a', '#f4f4f4'] },
@@ -112,6 +113,7 @@ export class Enemy {
           this.state = this.attack++ % 2 === 0 ? 'windup' : 'ring';
           this.stateT = this.state === 'windup' ? 0.7 : 1.4;
           this.ringShots = 0;
+          if (this.state === 'windup') Sound.play('charge');
         }
         return [nx * this.speed, ny * this.speed];
       case 'windup':

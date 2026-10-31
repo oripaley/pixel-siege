@@ -2,6 +2,7 @@ import { Input } from '../input.js';
 import { SPR, drawSprite, drawShadow } from '../sprites.js';
 import { clamp } from '../collision.js';
 import { Bullet } from './bullet.js';
+import { Sound } from '../audio.js';
 
 const SPEED = 82;
 const BULLET_SPEED = 260;
@@ -65,6 +66,7 @@ export class Player {
     scene.particles.muzzle(mx, my, this.aim);
     scene.particles.shell(this.handX, this.handY, this.facing);
     scene.shake(0.8, 0.05);
+    Sound.play('shoot');
     this.recoil = 2;
   }
 

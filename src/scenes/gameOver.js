@@ -1,6 +1,7 @@
 import { core, W, H } from '../core.js';
 import { Input } from '../input.js';
 import { Save } from '../save.js';
+import { Sound } from '../audio.js';
 import { getFloor } from '../sprites.js';
 import { drawText, drawPanel, Button } from '../ui.js';
 import { GameScene } from './game.js';
@@ -12,6 +13,7 @@ export class GameOverScene {
     this.score = score;
     this.t = 0;
     this.isBest = Save.record({ score, reachedLevel: levelNum });
+    Sound.play('gameOver');
     this.buttons = [
       new Button('RETRY LEVEL', W / 2 - 104, 132, 100, 15, () => this.retry()),
       new Button('MAIN MENU', W / 2 + 4, 132, 100, 15, () => core.go(new MenuScene())),

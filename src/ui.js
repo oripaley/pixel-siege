@@ -1,6 +1,7 @@
 // Tiny 3x5 bitmap font, buttons and HUD helpers.
 import { Input } from './input.js';
 import { SPR } from './sprites.js';
+import { Sound } from './audio.js';
 
 // Each glyph: 5 rows of 3 bits.
 const GLYPHS = {
@@ -67,9 +68,12 @@ export class Button {
   }
   update() {
     const m = Input.mouse;
+    const was = this.hover;
     this.hover = this.enabled && m.x >= this.x && m.x < this.x + this.w && m.y >= this.y && m.y < this.y + this.h;
+    if (this.hover && !was) Sound.play('hover');
     if (this.hover && m.clicked) {
       m.clicked = false;
+      Sound.play('click');
       this.onClick();
     }
   }

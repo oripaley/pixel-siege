@@ -1,6 +1,7 @@
 import { core, W, H } from './core.js';
 import { Input } from './input.js';
 import { Save } from './save.js';
+import { Sound } from './audio.js';
 import { SPR, drawSprite } from './sprites.js';
 import { MenuScene } from './scenes/menu.js';
 
@@ -19,6 +20,10 @@ resize();
 
 Input.init(canvas, W, H);
 Save.load();
+Sound.setMuted(Save.data.muted);
+// Browsers only allow audio after a user gesture.
+addEventListener('pointerdown', () => Sound.init());
+addEventListener('keydown', () => Sound.init());
 core.go(new MenuScene());
 
 // Fixed-timestep loop: logic at 60 Hz, render every animation frame.
@@ -30,6 +35,7 @@ function frame(now) {
   acc += Math.min(0.25, (now - last) / 1000);
   last = now;
   while (acc >= STEP) {
+    if (Input.wasPressed('KeyM')) Sound.toggle();
     core.scene.update(STEP);
     Input.endStep();
     core.time += STEP;

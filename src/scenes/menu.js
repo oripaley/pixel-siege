@@ -1,6 +1,7 @@
 import { core, W, H } from '../core.js';
 import { Input } from '../input.js';
 import { Save } from '../save.js';
+import { Sound } from '../audio.js';
 import { SPR, drawSprite, getFloor } from '../sprites.js';
 import { drawText, drawPanel, Button } from '../ui.js';
 import { Player } from '../entities/player.js';
@@ -42,6 +43,7 @@ export class MenuScene {
         new Button('START GAME', bx, 82, bw, 15, () => this.start(1)),
         new Button('LEVEL SELECT', bx, 102, bw, 15, () => (this.view = 'levels')),
         new Button('HOW TO PLAY', bx, 122, bw, 15, () => (this.view = 'help')),
+        (this.soundButton = new Button(Sound.label, W - 58, 4, 54, 11, () => Sound.toggle())),
       ],
       levels: [...levelButtons, back()],
       help: [back()],
@@ -55,6 +57,7 @@ export class MenuScene {
   update(dt) {
     this.t += dt;
     for (const b of this.buttons[this.view]) b.update();
+    this.soundButton.label = Sound.label;
     if (this.view === 'main' && Input.wasPressed('Enter', 'Space')) this.start(1);
     if (this.view !== 'main' && Input.wasPressed('Escape')) this.view = 'main';
 
@@ -115,10 +118,11 @@ export class MenuScene {
       ['MOUSE', 'AIM'],
       ['CLICK / HOLD', 'SHOOT'],
       ['ESC / P', 'PAUSE'],
+      ['M', 'SOUND ON/OFF'],
     ];
     lines.forEach(([k, v], i) => {
-      drawText(ctx, k, 150, 40 + i * 9, { align: 'right', color: '#ffd23f' });
-      drawText(ctx, v, 162, 40 + i * 9);
+      drawText(ctx, k, 150, 38 + i * 8, { align: 'right', color: '#ffd23f' });
+      drawText(ctx, v, 162, 38 + i * 8);
     });
     drawText(ctx, 'CLEAR EVERY WAVE TO BEAT THE LEVEL.', W / 2, 80, { align: 'center', color: '#9ea3b8' });
     ctx.drawImage(SPR.heart.img, 66, 88);
