@@ -1,5 +1,7 @@
 # Pixel Siege
 
+**▶ Play it online: https://oripaley.github.io/pixel-siege/**
+
 A small retro top-down arena shooter for the browser. It is written in vanilla JavaScript with Canvas and has no dependencies or build step.
 
 ## Play
